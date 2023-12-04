@@ -1,7 +1,8 @@
 package playground.couponsystem.domain.coupon.service.impl;
 
+import static playground.couponsystem.common.utils.StringToByteBufferUtils.toByteBuffer;
+
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 
 import org.springframework.data.redis.connection.ReturnType;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
@@ -36,16 +37,16 @@ public class CouponWalletServiceImpl implements CouponWalletService {
                 .flatMap(tuple -> {
                     final User user = tuple.getT1();
                     final Coupon coupon = tuple.getT2();
-                    final ByteBuffer scriptByteBuffer = StandardCharsets.UTF_8.encode("local key = KEYS[1]\n" +
-                                                                                "local userId = ARGV[1]\n" +
-                                                                                "local remainingQuantity = redis.call('SCARD', key)\n" +
-                                                                                "if remainingQuantity < 1000 then\n" +
-                                                                                "    return redis.call('SADD', key, userId) > 0\n" +
-                                                                                "else\n" +
-                                                                                "    return false\n" +
-                                                                                "end");
-                    final ByteBuffer keyByteBuffer = StandardCharsets.UTF_8.encode("coupon:" + coupon.getCode());
-                    final ByteBuffer userIdByteBuffer = StandardCharsets.UTF_8.encode(userId.toString());
+                    final ByteBuffer scriptByteBuffer = toByteBuffer("local key = KEYS[1]",
+                                                                     "local userId = ARGV[1]",
+                                                                     "local remainingQuantity = redis.call('SCARD', key)",
+                                                                     "if remainingQuantity < " + coupon.getAmount() + " then",
+                                                                     "    return redis.call('SADD', key, userId) > 0",
+                                                                     "else",
+                                                                     "    return false",
+                                                                     "end");
+                    final ByteBuffer keyByteBuffer = toByteBuffer("coupon:" + coupon.getCode());
+                    final ByteBuffer userIdByteBuffer = toByteBuffer(userId.toString());
                     return redisTemplate.execute(connection ->
                             connection.scriptingCommands().eval(
                                     scriptByteBuffer,

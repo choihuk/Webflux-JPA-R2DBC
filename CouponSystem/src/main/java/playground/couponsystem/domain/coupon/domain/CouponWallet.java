@@ -24,6 +24,8 @@ public class CouponWallet {
     @CreatedDate
     private LocalDateTime createdAt;
 
+    private LocalDateTime usedAt;
+
     public CouponWallet(Long userId, Long couponId) {
         this.userId = userId;
         this.couponId = couponId;

@@ -6,7 +6,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
-import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -18,23 +18,24 @@ public class Coupon {
     @Id
     private Long id;
 
-    @NotNull
     private String code;
 
-    @NotNull
     private CouponType type;
 
-    @NotNull
     private Double discount;
+
+    private Double amount;
 
     @CreatedDate
     private LocalDateTime createdAt;
 
     private LocalDateTime usedAt;
 
-    public Coupon(String code, CouponType type, Double discount) {
+    @Builder
+    public Coupon(String code, CouponType type, Double discount, Double amount) {
         this.code = code;
         this.type = type;
         this.discount = discount;
+        this.amount = amount;
     }
 }

@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import playground.couponsystem.domain.coupon.dto.request.CreateCouponRequest;
 import playground.couponsystem.domain.coupon.dto.response.CreateCouponResponse;
@@ -21,7 +22,7 @@ public class CouponController {
 
     @PostMapping("/create")
     public Mono<ResponseEntity<CreateCouponResponse>> createCoupon(
-            @RequestBody Mono<CreateCouponRequest> request) {
+            @Valid @RequestBody Mono<CreateCouponRequest> request) {
         return request.flatMap(couponService::createCoupon)
                         .map(ResponseEntity::ok);
     }

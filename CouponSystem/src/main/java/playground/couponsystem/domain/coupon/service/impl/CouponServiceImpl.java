@@ -20,8 +20,13 @@ public class CouponServiceImpl implements CouponService {
 
     @Override
     @Transactional
-    public Mono<CreateCouponResponse> createCoupon(CreateCouponRequest dto) {
-        return couponRepository.save(new Coupon(dto.code(), dto.type(), dto.discount()))
+    public Mono<CreateCouponResponse> createCoupon(final CreateCouponRequest dto) {
+        return couponRepository.save(Coupon.builder()
+                                           .code(dto.code())
+                                           .type(dto.type())
+                                           .discount(dto.discount())
+                                           .amount(dto.amount())
+                                           .build())
                                .map(coupon -> CreateCouponResponse.of(coupon.getId()));
     }
 }

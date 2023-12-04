@@ -1,4 +1,7 @@
 package playground.couponsystem.domain.coupon.dto.request;
 
-public record IssueCouponRequest(Long userId, Long couponId) {
+import jakarta.validation.constraints.NotNull;
+
+public record IssueCouponRequest(@NotNull Long userId,
+                                 @NotNull Long couponId) {
 }
