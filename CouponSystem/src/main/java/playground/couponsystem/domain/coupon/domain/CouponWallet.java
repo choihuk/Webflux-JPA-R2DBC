@@ -6,35 +6,26 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Table(name = "coupon")
+@Table(name = "coupon_wallet")
 @Getter
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
-public class Coupon {
+public class CouponWallet {
 
     @Id
     private Long id;
 
-    @NotNull
-    private String code;
+    private Long userId;
 
-    @NotNull
-    private CouponType type;
-
-    @NotNull
-    private Double discount;
+    private Long couponId;
 
     @CreatedDate
     private LocalDateTime createdAt;
 
-    private LocalDateTime usedAt;
-
-    public Coupon(String code, CouponType type, Double discount) {
-        this.code = code;
-        this.type = type;
-        this.discount = discount;
+    public CouponWallet(Long userId, Long couponId) {
+        this.userId = userId;
+        this.couponId = couponId;
     }
 }

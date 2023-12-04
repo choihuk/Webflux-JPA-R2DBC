@@ -7,7 +7,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
-import playground.couponsystem.domain.coupon.dto.request.CouponIssueRequest;
+import playground.couponsystem.domain.coupon.dto.request.CreateCouponRequest;
+import playground.couponsystem.domain.coupon.dto.response.CreateCouponResponse;
 import playground.couponsystem.domain.coupon.service.CouponService;
 import reactor.core.publisher.Mono;
 
@@ -18,10 +19,10 @@ public class CouponController {
 
     private final CouponService couponService;
 
-    @PostMapping("/issue")
-    public Mono<ResponseEntity<?>> issueCoupon(@RequestBody Mono<CouponIssueRequest> request) {
-        return request.flatMap(dto ->
-                               couponService.issueCoupon(dto.userId(), dto.couponCode()))
-                      .then(Mono.just(ResponseEntity.ok().build()));
+    @PostMapping("/create")
+    public Mono<ResponseEntity<CreateCouponResponse>> createCoupon(
+            @RequestBody Mono<CreateCouponRequest> request) {
+        return request.flatMap(couponService::createCoupon)
+                        .map(ResponseEntity::ok);
     }
 }
