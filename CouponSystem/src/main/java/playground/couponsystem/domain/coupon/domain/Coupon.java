@@ -24,15 +24,13 @@ public class Coupon {
 
     private Double discount;
 
-    private Double amount;
+    private Long amount;
 
     @CreatedDate
     private LocalDateTime createdAt;
 
-    private LocalDateTime usedAt;
-
     @Builder
-    public Coupon(String code, CouponType type, Double discount, Double amount) {
+    public Coupon(String code, CouponType type, Double discount, Long amount) {
         this.code = code;
         this.type = type;
         this.discount = discount;
