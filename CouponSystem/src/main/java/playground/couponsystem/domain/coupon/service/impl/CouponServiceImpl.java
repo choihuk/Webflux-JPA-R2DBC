@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import playground.couponsystem.domain.coupon.domain.Coupon;
-import playground.couponsystem.domain.coupon.dto.request.CreateCouponRequest;
+import playground.couponsystem.domain.coupon.dto.request.IssueCouponRequest;
 import playground.couponsystem.domain.coupon.dto.response.CouponInfoResponse;
 import playground.couponsystem.domain.coupon.dto.response.CreateCouponResponse;
 import playground.couponsystem.domain.coupon.repository.CouponRepository;
@@ -24,7 +24,7 @@ public class CouponServiceImpl implements CouponService {
 
     @Override
     @Transactional
-    public Mono<CreateCouponResponse> createCoupon(final CreateCouponRequest dto) {
+    public Mono<CreateCouponResponse> createCoupon(final IssueCouponRequest dto) {
         return couponRepository.save(Coupon.builder()
                                            .code(dto.code())
                                            .type(dto.type())
@@ -35,7 +35,7 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Override
-    public Mono<Page<CouponInfoResponse>> getCoupons(Pageable pageable) {
+    public Mono<Page<CouponInfoResponse>> getCouponsInfo(final Pageable pageable) {
         return couponRepository.findAllBy(pageable)
                 .map(CouponInfoResponse::of)
                 .collectList()

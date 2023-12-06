@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import playground.couponsystem.domain.coupon.domain.Coupon;
 import playground.couponsystem.domain.coupon.domain.CouponWallet;
-import playground.couponsystem.domain.coupon.dto.response.IssueCouponResponse;
+import playground.couponsystem.domain.coupon.dto.response.IssueCouponWalletResponse;
 import playground.couponsystem.domain.coupon.repository.CouponWalletRepository;
 import playground.couponsystem.domain.coupon.service.CouponQueryService;
 import playground.couponsystem.domain.coupon.service.CouponWalletService;
@@ -32,7 +32,7 @@ public class CouponWalletServiceImpl implements CouponWalletService {
 
     @Override
     @Transactional
-    public Mono<IssueCouponResponse> issueCoupon(final Long userId, final Long couponId) {
+    public Mono<IssueCouponWalletResponse> issueCoupon(final Long userId, final Long couponId) {
         return Mono.zip(userQueryService.getUser(userId), couponQueryService.getCoupon(couponId))
                 .flatMap(tuple -> {
                     final User user = tuple.getT1();
@@ -56,10 +56,10 @@ public class CouponWalletServiceImpl implements CouponWalletService {
                                     userIdByteBuffer
                             )).flatMap(result -> {
                                 if ((boolean) result) {
-                                    return couponWalletRepository.save(new CouponWallet(
-                                                                         user.getId(), coupon.getId()))
-                                            .flatMap(couponWallet ->
-                                                        Mono.just(new IssueCouponResponse(couponWallet.getId())));
+                                    return couponWalletRepository.save(
+                                            new CouponWallet(user.getId(), coupon.getId())
+                                    ).flatMap(couponWallet ->
+                                                Mono.just(IssueCouponWalletResponse.of(couponWallet.getId())));
                                 } else {
                                     return Mono.error(new RuntimeException("Coupon is out of stock"));
                                 }

@@ -1,8 +1,8 @@
 package playground.couponsystem.domain.coupon.service;
 
-import playground.couponsystem.domain.coupon.dto.response.IssueCouponResponse;
+import playground.couponsystem.domain.coupon.dto.response.IssueCouponWalletResponse;
 import reactor.core.publisher.Mono;
 
 public interface CouponWalletService {
-    Mono<IssueCouponResponse> issueCoupon(Long userId, Long couponId);
+    Mono<IssueCouponWalletResponse> issueCoupon(Long userId, Long couponId);
 }
