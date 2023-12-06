@@ -10,6 +10,7 @@ import playground.couponsystem.domain.coupon.domain.Coupon;
 
 @Builder(access = lombok.AccessLevel.PRIVATE)
 public record CouponInfoResponse(@Schema(description = "쿠폰 id") Long couponId,
+                                 @Schema(description = "쿠폰 이름") String name,
                                  @Schema(description = "쿠폰 코드") String code,
                                  @Schema(description = "쿠폰 종류") String type,
                                  @Schema(description = "할인 정도") Double discount,
@@ -21,6 +22,7 @@ public record CouponInfoResponse(@Schema(description = "쿠폰 id") Long couponI
     public static CouponInfoResponse of(Coupon coupon) {
         return CouponInfoResponse.builder()
                                  .couponId(coupon.getId())
+                                 .name(coupon.getName())
                                  .code(coupon.getCode())
                                  .type(coupon.getType().name())
                                  .discount(coupon.getDiscount())

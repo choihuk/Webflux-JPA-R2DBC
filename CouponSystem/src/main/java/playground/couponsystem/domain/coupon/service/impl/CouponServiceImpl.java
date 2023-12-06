@@ -26,6 +26,7 @@ public class CouponServiceImpl implements CouponService {
     @Transactional
     public Mono<CreateCouponResponse> createCoupon(final IssueCouponRequest dto) {
         return couponRepository.save(Coupon.builder()
+                                           .name(dto.name())
                                            .code(dto.code())
                                            .type(dto.type())
                                            .discount(dto.discount())

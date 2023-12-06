@@ -58,7 +58,8 @@ public class CouponController {
             @Parameter(name = "page", description = "페이지네이션의 페이지 넘버. 0부터 시작함", in = ParameterIn.QUERY)
             @RequestParam(value = "page", required = false, defaultValue = "0") int page,
             @Parameter(name = "size", description = "페이지네이션의 페이지당 데이터 수", in = ParameterIn.QUERY)
-            @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
+            @RequestParam(value = "size", required = false, defaultValue = "20") int size
+    ) {
         return Mono.just(PageRequest.of(page, size))
                    .flatMap(couponService::getCouponsInfo)
                        .map(ResponseEntity::ok);

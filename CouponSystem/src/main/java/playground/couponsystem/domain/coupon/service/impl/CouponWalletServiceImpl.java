@@ -4,6 +4,9 @@ import static playground.couponsystem.common.utils.StringToByteBufferUtils.toByt
 
 import java.nio.ByteBuffer;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.connection.ReturnType;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -12,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import playground.couponsystem.domain.coupon.domain.Coupon;
 import playground.couponsystem.domain.coupon.domain.CouponWallet;
+import playground.couponsystem.domain.coupon.dto.response.CouponWalletResponse;
 import playground.couponsystem.domain.coupon.dto.response.IssueCouponWalletResponse;
 import playground.couponsystem.domain.coupon.repository.CouponWalletRepository;
 import playground.couponsystem.domain.coupon.service.CouponQueryService;
@@ -65,5 +69,13 @@ public class CouponWalletServiceImpl implements CouponWalletService {
                                 }
                             }).next();
                 });
+    }
+
+    @Override
+    public Mono<Page<CouponWalletResponse>> getCouponWallets(Pageable pageable) {
+        return couponWalletRepository.findAllCouponWalletsWithUserInfo(pageable)
+                                     .collectList()
+                                     .zipWith(couponWalletRepository.count())
+                                     .map(p -> new PageImpl<>(p.getT1(), pageable, p.getT2()));
     }
 }

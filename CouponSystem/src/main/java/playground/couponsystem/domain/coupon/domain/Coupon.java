@@ -18,6 +18,8 @@ public class Coupon {
     @Id
     private Long id;
 
+    private String name;
+
     private String code;
 
     private CouponType type;
@@ -30,7 +32,8 @@ public class Coupon {
     private LocalDateTime createdAt;
 
     @Builder
-    public Coupon(String code, CouponType type, Double discount, Long amount) {
+    public Coupon(String name, String code, CouponType type, Double discount, Long amount) {
+        this.name = name;
         this.code = code;
         this.type = type;
         this.discount = discount;
