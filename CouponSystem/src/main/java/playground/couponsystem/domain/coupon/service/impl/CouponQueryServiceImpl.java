@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import playground.couponsystem.domain.coupon.domain.Coupon;
+import playground.couponsystem.domain.coupon.exception.CouponNotFoundException;
 import playground.couponsystem.domain.coupon.repository.CouponRepository;
 import playground.couponsystem.domain.coupon.service.CouponQueryService;
 import reactor.core.publisher.Mono;
@@ -19,7 +20,7 @@ public class CouponQueryServiceImpl implements CouponQueryService {
     @Override
     public Mono<Coupon> getCoupon(final Long couponId) {
         return couponRepository.findById(couponId)
-                .switchIfEmpty(Mono.error(new RuntimeException("Coupon not found")));
+                .switchIfEmpty(Mono.error(new CouponNotFoundException()));
     }
 
 }

@@ -12,4 +12,6 @@ public interface CouponService {
     Mono<CreateCouponResponse> createCoupon(IssueCouponRequest dto);
 
     Mono<Page<CouponInfoResponse>> getCouponsInfo(Pageable pageable);
+
+    Mono<CouponInfoResponse> getCouponInfo(Long couponId);
 }

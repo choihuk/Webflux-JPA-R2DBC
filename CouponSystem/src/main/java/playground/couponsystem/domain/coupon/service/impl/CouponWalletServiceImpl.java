@@ -13,12 +13,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import playground.couponsystem.common.exception.BusinessException;
+import playground.couponsystem.common.exception.ErrorCode;
 import playground.couponsystem.domain.coupon.domain.Coupon;
 import playground.couponsystem.domain.coupon.domain.CouponWallet;
-import playground.couponsystem.domain.coupon.dto.response.CouponWalletResponse;
+import playground.couponsystem.domain.coupon.dto.response.CouponUsageStatusResponse;
 import playground.couponsystem.domain.coupon.dto.response.IssueCouponWalletResponse;
 import playground.couponsystem.domain.coupon.repository.CouponWalletRepository;
 import playground.couponsystem.domain.coupon.service.CouponQueryService;
+import playground.couponsystem.domain.coupon.service.CouponWalletQueryService;
 import playground.couponsystem.domain.coupon.service.CouponWalletService;
 import playground.couponsystem.domain.user.domain.User;
 import playground.couponsystem.domain.user.service.UserQueryService;
@@ -32,6 +35,7 @@ public class CouponWalletServiceImpl implements CouponWalletService {
     private final UserQueryService userQueryService;
     private final CouponQueryService couponQueryService;
     private final CouponWalletRepository couponWalletRepository;
+    private final CouponWalletQueryService couponWalletQueryService;
     private final ReactiveStringRedisTemplate redisTemplate;
 
     @Override
@@ -65,17 +69,27 @@ public class CouponWalletServiceImpl implements CouponWalletService {
                                     ).flatMap(couponWallet ->
                                                 Mono.just(IssueCouponWalletResponse.of(couponWallet.getId())));
                                 } else {
-                                    return Mono.error(new RuntimeException("Coupon is out of stock"));
+                                    return Mono.error(new BusinessException(ErrorCode.COUPON_SOLD_OUT));
                                 }
                             }).next();
                 });
     }
 
     @Override
-    public Mono<Page<CouponWalletResponse>> getCouponWallets(Pageable pageable) {
-        return couponWalletRepository.findAllCouponWalletsWithUserInfo(pageable)
+    public Mono<Page<CouponUsageStatusResponse>> getCouponUsageStatus(final Pageable pageable) {
+        return couponWalletRepository.findAllCouponUsageStatus(pageable)
                                      .collectList()
                                      .zipWith(couponWalletRepository.count())
                                      .map(p -> new PageImpl<>(p.getT1(), pageable, p.getT2()));
+    }
+
+    @Override
+    @Transactional
+    public Mono<Void> useCoupon(Long couponWalletId) {
+        return couponWalletQueryService.getCouponWallet(couponWalletId)
+                .flatMap(couponWallet -> {
+                    couponWallet.useCoupon();
+                    return couponWalletRepository.save(couponWallet).then();
+                });
     }
 }

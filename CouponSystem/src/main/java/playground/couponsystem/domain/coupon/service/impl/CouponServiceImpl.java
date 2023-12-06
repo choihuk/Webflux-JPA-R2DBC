@@ -1,5 +1,7 @@
 package playground.couponsystem.domain.coupon.service.impl;
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -7,11 +9,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import playground.couponsystem.common.exception.BusinessException;
+import playground.couponsystem.common.exception.ErrorCode;
 import playground.couponsystem.domain.coupon.domain.Coupon;
 import playground.couponsystem.domain.coupon.dto.request.IssueCouponRequest;
 import playground.couponsystem.domain.coupon.dto.response.CouponInfoResponse;
 import playground.couponsystem.domain.coupon.dto.response.CreateCouponResponse;
 import playground.couponsystem.domain.coupon.repository.CouponRepository;
+import playground.couponsystem.domain.coupon.service.CouponQueryService;
 import playground.couponsystem.domain.coupon.service.CouponService;
 import reactor.core.publisher.Mono;
 
@@ -21,18 +26,18 @@ import reactor.core.publisher.Mono;
 public class CouponServiceImpl implements CouponService {
 
     private final CouponRepository couponRepository;
+    private final CouponQueryService couponQueryService;
 
     @Override
     @Transactional
     public Mono<CreateCouponResponse> createCoupon(final IssueCouponRequest dto) {
-        return couponRepository.save(Coupon.builder()
-                                           .name(dto.name())
-                                           .code(dto.code())
-                                           .type(dto.type())
-                                           .discount(dto.discount())
-                                           .amount(dto.amount())
-                                           .build())
-                               .map(coupon -> CreateCouponResponse.of(coupon.getId()));
+        return couponRepository.findByCode(dto.code())
+                   .flatMap(coupon -> Optional.ofNullable(coupon)
+                                              .map(c -> Mono.<CreateCouponResponse>error(
+                                                      new BusinessException(ErrorCode.COUPON_CODE_DUPLICATED)))
+                                              .orElseGet(() -> createCouponEntity(dto)
+                                                      .map(crateCoupon -> new CreateCouponResponse(
+                                                              crateCoupon.getId()))));
     }
 
     @Override
@@ -42,5 +47,21 @@ public class CouponServiceImpl implements CouponService {
                 .collectList()
                 .zipWith(couponRepository.count())
                 .map(p -> new PageImpl<>(p.getT1(), pageable, p.getT2()));
+    }
+
+    @Override
+    public Mono<CouponInfoResponse> getCouponInfo(Long couponId) {
+        return couponQueryService.getCoupon(couponId)
+                                 .map(CouponInfoResponse::of);
+    }
+
+    private Mono<Coupon> createCouponEntity(IssueCouponRequest dto) {
+        return couponRepository.save(Coupon.builder()
+                                           .name(dto.name())
+                                           .code(dto.code())
+                                           .type(dto.type())
+                                           .discount(dto.discount())
+                                           .amount(dto.amount())
+                                           .build());
     }
 }

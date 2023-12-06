@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import playground.couponsystem.domain.user.domain.User;
+import playground.couponsystem.domain.user.exception.UserNotFoundException;
 import playground.couponsystem.domain.user.repository.UserRepository;
 import playground.couponsystem.domain.user.service.UserQueryService;
 import reactor.core.publisher.Mono;
@@ -19,6 +20,6 @@ public class UserQueryServiceImpl implements UserQueryService {
     @Override
     public Mono<User> getUser(final Long userId) {
         return userRepository.findById(userId)
-                .switchIfEmpty(Mono.error(new RuntimeException("User not found")));
+                .switchIfEmpty(Mono.error(new UserNotFoundException()));
     }
 }

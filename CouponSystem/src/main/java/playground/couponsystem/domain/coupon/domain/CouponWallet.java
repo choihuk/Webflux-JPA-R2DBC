@@ -30,4 +30,8 @@ public class CouponWallet {
         this.userId = userId;
         this.couponId = couponId;
     }
+
+    public void useCoupon() {
+        this.usedAt = LocalDateTime.now();
+    }
 }
